@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import subprocess
+import json
 import os
 
 def get_directory(path):
@@ -40,7 +41,11 @@ def verify_dir(directory, relative_path):
             verify_dir(directory, os.path.sep.join([relative_path, child]))
 
 def get_default_username():
-    return os.getlogin()
+    config_path = os.path.expanduser("~/.orgdoc")
+    config = dict()
+    if os.path.isfile(config_path):
+        config.update(json.load(open(config_path)))
+    return config.get("username", os.getlogin())
 
 def sign():
     arguments_parser = ArgumentParser(description="Sign organization documents.")
