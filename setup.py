@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = "Orgdoc",
+    name = "orgdoc",
     version = "0.0",
     author = "Ângelo Nuffer",
     author_email = "angelonuffer@gmail.com",
