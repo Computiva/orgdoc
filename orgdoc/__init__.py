@@ -36,12 +36,13 @@ def verify_file(directory, relative_path):
 
 def verify_dir(directory, relative_path):
     for child in os.listdir(os.path.sep.join(directory + [relative_path])):
-        child_relative_path = os.path.sep.join([relative_path, child])
-        path = os.path.sep.join(directory + [child_relative_path])
-        if os.path.isfile(path):
-            verify_file(directory, child_relative_path)
-        if os.path.isdir(path):
-            verify_dir(directory, child_relative_path)
+        if not child.startswith("."):
+            child_relative_path = os.path.sep.join([relative_path, child])
+            path = os.path.sep.join(directory + [child_relative_path])
+            if os.path.isfile(path):
+                verify_file(directory, child_relative_path)
+            if os.path.isdir(path):
+                verify_dir(directory, child_relative_path)
 
 def get_default_username():
     config_path = os.path.expanduser("~/.orgdoc")
