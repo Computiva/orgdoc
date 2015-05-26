@@ -28,17 +28,20 @@ def verified_file(directory, relative_path):
                 return False
     return True
 
+def verify_file(directory, relative_path):
+    if verified_file(directory, relative_path):
+        print "\033[32m%s\033[m" % relative_path
+    else:
+        print "\033[31m%s\033[m" % relative_path
+
 def verify_dir(directory, relative_path):
     for child in os.listdir(os.path.sep.join(directory + [relative_path])):
         child_relative_path = os.path.sep.join([relative_path, child])
         path = os.path.sep.join(directory + [child_relative_path])
         if os.path.isfile(path):
-            if verified_file(directory, child_relative_path):
-                print "\033[32m%s\033[m" % child_relative_path
-            else:
-                print "\033[31m%s\033[m" % child_relative_path
+            verify_file(directory, child_relative_path)
         if os.path.isdir(path):
-            verify_dir(directory, os.path.sep.join([relative_path, child]))
+            verify_dir(directory, child_relative_path)
 
 def get_default_username():
     config_path = os.path.expanduser("~/.orgdoc")
@@ -66,5 +69,12 @@ def sign():
     os.popen2(["openssl", "dgst", "-sha1", "-sign", privkey_path, "-out", "%s.%s.bin" % (signature_path, username), path])
 
 def verify():
+    arguments_parser = ArgumentParser(description="Verify repository signatures.")
+    arguments_parser.add_argument("-p", "--path", default=".", help="path to document or directory")
+    arguments = arguments_parser.parse_args()
+    path = vars(arguments)["path"]
     directory = get_directory(".")
-    verify_dir(directory, ".")
+    if os.path.isfile(path):
+        verify_file(directory, path)
+    if os.path.isdir(path):
+        verify_dir(directory, path)
