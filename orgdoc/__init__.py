@@ -36,7 +36,7 @@ def verify_file(directory, relative_path):
 
 def verify_dir(directory, relative_path):
     for child in os.listdir(os.path.sep.join(directory + [relative_path])):
-        if not child.startswith("."):
+        if not child.startswith(".") and not child.endswith(".privkey.pem"):
             child_relative_path = os.path.sep.join([relative_path, child])
             path = os.path.sep.join(directory + [child_relative_path])
             if os.path.isfile(path):
