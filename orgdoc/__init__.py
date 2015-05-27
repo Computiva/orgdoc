@@ -14,25 +14,30 @@ def get_directory(path):
             return directory
         directory = directory[:-1]
 
-def verified_file(directory, relative_path):
+def verify_signatures(directory, relative_path):
     path = os.path.sep.join(directory + [relative_path])
+    without_signature = list()
     for key in os.listdir(os.path.sep.join(directory + ["pubkeys"])):
         if key.endswith(".pubkey.pem"):
             username = key[:-len(".pubkey.pem")]
             signature_path = os.path.sep.join(directory + ["signatures", "%s.%s.bin" % (relative_path, username)])
             if not os.path.isfile(signature_path):
-                return False
-            pubkey_path = os.path.sep.join(directory + ["pubkeys", key])
-            procw, procr = os.popen2(["openssl", "dgst", "-sha1", "-verify", pubkey_path, "-signature", signature_path, path])
-            if procr.read() != "Verified OK\n":
-                return False
-    return True
+                without_signature.append(username)
+            else:
+                pubkey_path = os.path.sep.join(directory + ["pubkeys", key])
+                procw, procr = os.popen2(["openssl", "dgst", "-sha1", "-verify", pubkey_path, "-signature", signature_path, path])
+                if procr.read() != "Verified OK\n":
+                    without_signature.append(username)
+    return without_signature
 
 def verify_file(directory, relative_path):
-    if verified_file(directory, relative_path):
-        print "\033[32m%s\033[m" % relative_path
-    else:
+    without_signature = verify_signatures(directory, relative_path)
+    if without_signature:
         print "\033[31m%s\033[m" % relative_path
+        for username in without_signature:
+            print "\033[31m    - %s\033[m" % username
+    else:
+        print "\033[32m%s\033[m" % relative_path
 
 def verify_dir(directory, relative_path):
     for child in os.listdir(os.path.sep.join(directory + [relative_path])):
