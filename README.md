@@ -1,5 +1,5 @@
-Orgdoc
-======
+Orgdoc 0.1.0
+============
 
 0. OBJECTIVE
 
@@ -17,9 +17,9 @@ Orgdoc
 
 		>  # python setup.py install
 
-	0. Create a directory named pubkeys on repository root.
+	0. Create a directory named pubkeys on repository root (if you don't have a documents directory, create one).
 
-		> $ cd path_to_documents_directory
+		> $ cd PATH_TO_DOCUMENTS_DIRECTORY
 		> $ mkdir pubkeys
 
 0. USING
