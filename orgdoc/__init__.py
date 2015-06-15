@@ -54,7 +54,10 @@ def get_default_username():
     config = dict()
     if os.path.isfile(config_path):
         config.update(json.load(open(config_path)))
-    return config.get("username", os.getlogin())
+    try:
+        return config.get("username", os.getlogin())
+    except OSError:
+        return config.get("username", "user")
 
 def sign():
     arguments_parser = ArgumentParser(description="Sign organization documents.")
@@ -67,6 +70,8 @@ def sign():
     privkey_path = os.path.sep.join(directory + ["pubkeys", "%s.privkey.pem" % username])
     if not os.path.isfile(privkey_path):
         pubkey_path = os.path.sep.join(directory + ["pubkeys", "%s.pubkey.pem" % username])
+        open(privkey_path, "w").close()
+        os.chmod(privkey_path, 0b110000000)
         subprocess.call(["openssl", "genpkey", "-algorithm", "RSA", "-pkeyopt", "rsa_keygen_bits:2048", "-pkeyopt", "rsa_keygen_pubexp:3", "-out", privkey_path])
         os.popen2(["openssl", "pkey", "-in", privkey_path, "-out", pubkey_path, "-pubout"])
     relative_path = os.path.relpath(path, start=os.path.sep.join(directory))
